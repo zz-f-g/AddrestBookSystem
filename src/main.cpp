@@ -24,11 +24,7 @@ void enterInterface() {
     cout << "**********************************" << endl;
 }
 
-void addPerson(person* Container, int* ptr_len){
-    if (*ptr_len > MAXSIZE - 1) {
-        cout << "Persons Overflow" << endl;
-        return;
-    }
+person inputPerson(){
     person newPerson;
     cout << "Input the name:" << endl;
     cin >> newPerson.name;
@@ -40,7 +36,15 @@ void addPerson(person* Container, int* ptr_len){
     cin >> newPerson.tel;
     cout << "Input the address:" << endl;
     cin >> newPerson.address;
-    Container[*ptr_len] = newPerson;
+    return newPerson;
+}
+
+void addPerson(person* Container, int* ptr_len){
+    if (*ptr_len > MAXSIZE - 1) {
+        cout << "Persons Overflow" << endl;
+        return;
+    }
+    Container[*ptr_len] = inputPerson();
     *ptr_len += 1;
 }
 
@@ -65,55 +69,56 @@ void showPersons(person* Container, int* ptr_len){
 }
 
 void delArr(person* Container, int* ptr_len, int i){
-    ; // deletion in Linear Array
-}
-
-bool delPerson(person* Container, int* ptr_len){
-    int flag;
-    flag = findPerson(Container, ptr_len);
-    if (flag < 0) {
-        return false;
-    } else {
-        delArr(Container, ptr_len, flag);
-        return true;
+    for (int j=i; j<*ptr_len-1; j++) { // deletion in Linear Array
+        Container[j] = Container[j+1];
     }
+    *ptr_len -= 1;
 }
 
-int findPerson(person* Container, int* ptr_len){
+int findPerson(person* Container, int* ptr_len, string delName){
     int flag = -1;
-    string delName;
-    cin >> delName;
     for (int i=0; i<*ptr_len; i++) {
         if (delName == Container[i].name) {
             flag = i;
             break;
         }
     }
+    if (flag < 0) {
+        cout << "No person named " << delName << "." << endl;
+    }
     return flag;
 }
 
-void find_show(person* Container, int* ptr_len){
-    int flag = findPerson(Container, ptr_len);
-    showTitle();
-    showPerson(Container, ptr_len, flag);
+void delPerson(person* Container, int* ptr_len){
+    string delName;
+    cin >> delName;
+    if (*ptr_len == 0) {
+        cout << "No person exists." << endl;
+    }
+    int flag = findPerson(Container, ptr_len, delName);
+    if (flag < 0) {
+        cout << "No person named " << delName << endl;
+    } else {
+        delArr(Container, ptr_len, flag);
+    }
 }
 
-bool changePerson(person* Container, int* ptr_len){
-    int i = findPerson(Container, ptr_len);
-    if (i < 0) {
-        return false;
-    } else {
-        cout << "Input the name:" << endl;
-        cin >> Container[i].name;
-        cout << "Input the gender: (1 for man and 0 for woman)" << endl;
-        cin >> Container[i].gender;
-        cout << "Input the age:" << endl;
-        cin >> Container[i].age;
-        cout << "Input the tel:" << endl;
-        cin >> Container[i].tel;
-        cout << "Input the address:" << endl;
-        cin >> Container[i].address;
-        return true;
+void find_show(person* Container, int* ptr_len){
+    string delName;
+    cin >> delName;
+    int flag = findPerson(Container, ptr_len, delName);
+    if (flag>=0) {
+        showTitle();
+        showPerson(Container, ptr_len, flag);
+    }
+}
+
+void changePerson(person* Container, int* ptr_len){
+    string Name;
+    cin >> Name;
+    int i = findPerson(Container, ptr_len, Name);
+    if (i >= 0) {
+        Container[i] = inputPerson();
     }
 }
 
@@ -121,15 +126,20 @@ void clearAll(int* ptr_len){
     *ptr_len = 0;
 }
 
-void exitSystem(person* Container, int* ptr_len){
+void launchSystem(person* Container, int* ptr_len){
     ;
 }
 
+void exitSystem(person* Container, int* ptr_len){
+    cout << "Exit the system!" << endl;
+}
+
 void switchFunc(person* Container,int* ptr_len) {
-    int funcType;
+    enterInterface();
+    char funcType;
     cout << "Select the func:" << endl;
     cin >> funcType;
-    switch (funcType)
+    switch (funcType-'0')
     {
     case 0:
         exitSystem(Container, ptr_len);
@@ -167,10 +177,9 @@ void switchFunc(person* Container,int* ptr_len) {
 }
 
 int main() {
-    enterInterface();
     person Container[MAXSIZE];
     int len = 0;
+    launchSystem(Container, &len);
     switchFunc(Container, &len);
-    cout << "Exit the system!" << endl;
     return 0;
 }
